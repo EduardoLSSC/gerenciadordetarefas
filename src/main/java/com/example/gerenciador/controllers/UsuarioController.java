@@ -6,6 +6,7 @@ import com.example.gerenciador.repositories.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,12 +32,6 @@ public class UsuarioController {
     @GetMapping("/usuarios")
     public ResponseEntity<List<Usuario>> getAllUsuarios() {
         List<Usuario> usuarioList = usuarioRepository.findAll();
-        if(!usuarioList.isEmpty()) {
-            for(Usuario usuario : usuarioList) {
-                Long id = usuario.getId();
-                usuario.add(linkTo(methodOn(UsuarioController.class).getOneUsuario(id)).withSelfRel());
-            }
-        }
         return ResponseEntity.status(HttpStatus.OK).body(usuarioList);
     }
 
@@ -69,5 +64,14 @@ public class UsuarioController {
         usuarioRepository.delete(usuarioDeletado.get());
         return ResponseEntity.status(HttpStatus.OK).body("Usuário deletado com sucesso");
 
+    }
+
+    @PostMapping("/usuarios/login")
+    public ResponseEntity<Object> findUserByEmailAndPassword(@RequestBody @Valid UsuarioRecordDto usuarioRecordDto) {
+        Optional<Usuario> usuario = usuarioRepository.findUsuarioByEmailAndPassword(usuarioRecordDto.email(), usuarioRecordDto.password());
+        if(usuario.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(usuario);
     }
 }

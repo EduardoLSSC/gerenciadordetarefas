@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 @Entity
 @Table(name = "tb_usuario")
